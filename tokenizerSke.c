@@ -20,7 +20,12 @@ bool delim_character(char c, char delim)
    Zero terminators are not printable (therefore false) */
 bool non_delim_character(char c, char delim)
 {
-
+	if(c == '\0' || c == delim) {
+	 return FALSE;
+	}
+	else {
+	 return TRUE;
+	}
 }
 
 /* Returns a pointer to the first character of the next
