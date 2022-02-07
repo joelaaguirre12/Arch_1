@@ -8,10 +8,10 @@
 bool delim_character(char c, char delim)
 {
 	if(c == '\0' || c != delim) {
-	 return FALSE;
+	 return false;
 	}
 	else {
-	 return TRUE;
+	 return true;
 	}
 }
 
@@ -21,10 +21,10 @@ bool delim_character(char c, char delim)
 bool non_delim_character(char c, char delim)
 {
 	if(c == '\0' || c == delim) {
-	 return FALSE;
+	 return false;
 	}
 	else {
-	 return TRUE;
+	 return true;
 	}
 }
 
@@ -73,4 +73,8 @@ char** tokenize(char* str, char delim)
 void print_all_tokens(char** tokens)
 {
 
+}
+
+int main(void) {
+	return 0;
 }
