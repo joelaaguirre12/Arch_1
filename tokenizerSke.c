@@ -8,10 +8,12 @@
 bool delim_character(char c, char delim)
 {
 	if(c == '\0' || c != delim) {
-	 return false;
+		/* If c is null-terminator or is not delim, return false */
+		return false;
 	}
 	else {
-	 return true;
+		/* Otherwise c is not a null-terminator and is the delim */
+		return true;
 	}
 }
 
@@ -21,10 +23,12 @@ bool delim_character(char c, char delim)
 bool non_delim_character(char c, char delim)
 {
 	if(c == '\0' || c == delim) {
-	 return false;
+		/* If c is the null-terminator or is the delim */
+		return false;
 	}
 	else {
-	 return true;
+		/* Otherwise c is not a null-terminator and is not the delim */
+		return true;
 	}
 }
 
@@ -33,7 +37,18 @@ bool non_delim_character(char c, char delim)
    str does not contain any words.*/
 char *word_start(char* str,char delim)
 {
-
+	int *pchar;
+	int i;
+	pchar = &str[0];	
+	if(strlen(str) == 0) {
+		return 0;
+	}
+	else {
+		while (delim_character(*(pchar+i), delim)) {
+			i += 1;
+		}
+		return *(pchar+i);
+	}
 }
 
 /* Returns a pointer to the first delimiter character of the zero
@@ -75,6 +90,10 @@ void print_all_tokens(char** tokens)
 
 }
 
-int main(void) {
-	return 0;
+int main(void) 
+{
+	char c = getchar();
+	char delim = getchar();
+	printf("c = %c, delim = %c, Is c a delimiter? %d\n", c, delim, delim_character(c, delim));
+	printf("c = %c, delim = %c, Is c a non-delimiter? %d\n", c, delim, non_delim_character(c, delim));
 }
