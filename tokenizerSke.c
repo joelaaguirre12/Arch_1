@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 /* Return true (non-zero) if c is the delimiter character
    previously chosen by the user.
@@ -35,27 +36,44 @@ bool non_delim_character(char c, char delim)
 /* Returns a pointer to the first character of the next
    word starting with a non-delimiter character. Return a zero pointer if
    str does not contain any words.*/
-char *word_start(char* str,char delim)
+char *word_start(char *str, char delim)
 {
-	int *pchar;
-	int i;
-	pchar = &str[0];	
+	char *pchar;
+	pchar = str;
 	if(strlen(str) == 0) {
 		return 0;
 	}
 	else {
-		while (delim_character(*(pchar+i), delim)) {
-			i += 1;
+		// printf("Before increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
+		while (delim_character(*pchar, delim)) {
+			// printf("'%c' is not a delim, continuing loop...\n", *pchar);
+			pchar++;
+			// printf("Address: %d\n", pchar);
+			// printf("After increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
 		}
-		return *(pchar+i);
+		return pchar;
 	}
 }
 
 /* Returns a pointer to the first delimiter character of the zero
    terminated string*/
-char *end_word(char* str,char delim)
+char *end_word(char *str,char delim)
 {
-
+	char *pchar;
+	pchar = str;
+	if(strlen(str) == 0) {
+		return 0;
+	}
+	else {
+		// printf("Before increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
+		while (non_delim_character(*pchar, delim)) {
+			// printf("'%c' is not a delim, continuing loop...\n", *pchar);
+			pchar++;
+			// printf("Address: %d\n", pchar);
+			// printf("After increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
+		}
+		return pchar;
+	}
 }
 
 /* Counts the number of words or tokens*/
@@ -92,8 +110,13 @@ void print_all_tokens(char** tokens)
 
 int main(void) 
 {
-	char c = getchar();
-	char delim = getchar();
-	printf("c = %c, delim = %c, Is c a delimiter? %d\n", c, delim, delim_character(c, delim));
-	printf("c = %c, delim = %c, Is c a non-delimiter? %d\n", c, delim, non_delim_character(c, delim));
+	char delim = ',';
+	char *words; 
+	words = "hello,world,!";
+	printf("string: %s\n", words);
+	printf("string pointer: %d\n", *words);
+	printf("delim: %c\n", delim);
+	printf("word start: %c\n", *word_start(words, delim));
+	printf("word end: %c\n", *end_word(words, delim));
+	return 0;
 }
