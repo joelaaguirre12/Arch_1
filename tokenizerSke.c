@@ -102,7 +102,7 @@ int count_tokens(char* str,char delim)
    containing <len> chars from <inStr> */
 char *copy_str(char *inStr, short len, char delim)
 {
-	/* if user is asking for a string longer than the original string's 		   length, return the length of the string */
+	/* if user is asking for a string longer than the original string's length, return the length of the string */
 	if (len > strlen(inStr)) {
 		len = strlen(inStr);
 	}
@@ -142,19 +142,19 @@ char** tokenize(char* str, char delim)
 		char start = word_start(str, delim);
 		char end = end_word(str, delim);
 		int wordLength = end-start;
-		printf("Word length: %d\n", wordLength);
-		tokens[i] = *copy_str(str, wordLength, delim);
+		tokens[i] = copy_str(str, wordLength, delim);
+		printf("Token: %s\n", tokens[i]);
 		start = end;
 	}
 	tokens[i] = '\0';
-	return tokens;
+	return *tokens;
 }
 
 void print_all_tokens(char** tokens, int size)
 {	
 	int i;
 	for (i = 0; i < size; i++) {
-		printf("%s\n", tokens[i]);
+		printf("Token: %d\n", *tokens[i]);
 	}
 }
 
