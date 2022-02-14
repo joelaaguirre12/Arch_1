@@ -136,11 +136,26 @@ char *copy_str(char *inStr, short len, char delim)
 char** tokenize(char* str, char delim)
 {
 	int length = count_tokens(str, delim);
+	int i;
+	char** tokens[length+1];
+	for (i = 0; i < length; i++) {
+		char start = word_start(str, delim);
+		char end = end_word(str, delim);
+		int wordLength = end-start;
+		printf("Word length: %d\n", wordLength);
+		tokens[i] = *copy_str(str, wordLength, delim);
+		start = end;
+	}
+	tokens[i] = '\0';
+	return tokens;
 }
 
-void print_all_tokens(char** tokens)
-{
-
+void print_all_tokens(char** tokens, int size)
+{	
+	int i;
+	for (i = 0; i < size; i++) {
+		printf("%s\n", tokens[i]);
+	}
 }
 
 int main(void) 
@@ -155,6 +170,10 @@ int main(void)
 	printf("The delimiter is: %c\n", *x);
 	int totToks = count_tokens(pinput, deli);
 	printf("Number of tokens: %d\n", totToks);
-	printf("%d letters from string: %s\n", 5, copy_str(pinput, 7, deli));
+	printf("%d letters from string: %s\n", 7, copy_str(pinput, 7, deli));
+	printf("Tokenizing...\n");
+	char** tokens = tokenize(pinput, deli);
+	printf("Printing tokens...\n");
+	print_all_tokens(tokens, totToks);
 	return 0;
 }
