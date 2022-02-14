@@ -40,6 +40,7 @@ char *word_start(char *str, char delim)
 {
 	char *pchar;
 	pchar = str;
+	// if string is empty, return 0
 	if(strlen(str) == 0) {
 		return 0;
 	}
@@ -79,14 +80,31 @@ char *end_word(char *str,char delim)
 /* Counts the number of words or tokens*/
 int count_tokens(char* str,char delim)
 {
-
+	int num_tok = 0;
+	char *pchar;
+	pchar = str;
+	if (strlen(str) == 0) {
+		return num_tok;
+	}
+	else {
+		while (*pchar != '\0') {
+			if (delim_character(*pchar, delim)) {
+				num_tok++;
+			}
+			pchar++;
+		}
+		num_tok++;
+		return num_tok;
+	}
 }
 
 /* Returns a freshly allocated new zero-terminated string
    containing <len> chars from <inStr> */
 char *copy_str(char *inStr, short len, char delim)
 {
-
+	if (len == 0) {
+		return '\0';
+	}
 }
 
 /* Returns a freshly allocated zero-terminated vector of freshly allocated
@@ -110,13 +128,15 @@ void print_all_tokens(char** tokens)
 
 int main(void) 
 {
-	char delim = ',';
-	char *words; 
-	words = "hello,world,!";
-	printf("string: %s\n", words);
-	printf("string pointer: %d\n", *words);
-	printf("delim: %c\n", delim);
-	printf("word start: %c\n", *word_start(words, delim));
-	printf("word end: %c\n", *end_word(words, delim));
+	char input[] = "Hello,World,Joel,not";
+	char *pinput = input;
+	char deli = ',';
+
+	char *x = word_start(pinput, deli);
+	printf("The first letter is: %c\n", *x);
+	x = end_word(pinput, deli);
+	printf("The delimiter is: %c\n", *x);
+	int totToks = count_tokens(pinput, deli);
+	printf("Number of tokens: %d\n", totToks);
 	return 0;
 }
