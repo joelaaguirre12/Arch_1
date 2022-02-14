@@ -137,24 +137,26 @@ char** tokenize(char* str, char delim)
 {
 	int length = count_tokens(str, delim);
 	int i;
-	char** tokens[length+1];
+	char start;
+	char end;
+	char** tokens = (char**) malloc((strlen(str) * sizeof(char)));
 	for (i = 0; i < length; i++) {
-		char start = word_start(str, delim);
-		char end = end_word(str, delim);
+		char *start = word_start(str, delim);
+		char *end = end_word(str, delim);
 		int wordLength = end-start;
 		tokens[i] = copy_str(str, wordLength, delim);
-		printf("Token: %s\n", tokens[i]);
-		start = end;
+		printf("Token %d: %s\n", i, tokens[i]);
+		start = end++;
 	}
 	tokens[i] = '\0';
-	return *tokens;
+	return tokens;
 }
 
 void print_all_tokens(char** tokens, int size)
 {	
 	int i;
-	for (i = 0; i < size; i++) {
-		printf("Token: %d\n", *tokens[i]);
+	for (i = 0; i < size+1; i++) {
+		printf("Token %d: %s\n", i, tokens[i]);
 	}
 }
 
@@ -164,13 +166,13 @@ int main(void)
 	char *pinput = input;
 	char deli = ',';
 
+	printf("Input: %s\n", input);
 	char *x = word_start(pinput, deli);
 	printf("The first letter is: %c\n", *x);
 	x = end_word(pinput, deli);
 	printf("The delimiter is: %c\n", *x);
 	int totToks = count_tokens(pinput, deli);
 	printf("Number of tokens: %d\n", totToks);
-	printf("%d letters from string: %s\n", 7, copy_str(pinput, 7, deli));
 	printf("Tokenizing...\n");
 	char** tokens = tokenize(pinput, deli);
 	printf("Printing tokens...\n");
