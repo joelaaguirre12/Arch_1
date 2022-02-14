@@ -102,8 +102,25 @@ int count_tokens(char* str,char delim)
    containing <len> chars from <inStr> */
 char *copy_str(char *inStr, short len, char delim)
 {
+	/* if user is asking for a string longer than the original string's 		   length, return the length of the string */
+	if (len > strlen(inStr)) {
+		len = strlen(inStr);
+	}
+	char* string = (char*) malloc(len * sizeof(char));
+	char *pchar;
+	pchar = inStr;
+	int i;	
 	if (len == 0) {
 		return '\0';
+	}
+	else {
+		for (i = 0; i < len; i++) {
+			string[i] = *pchar;
+			//printf("String: %c *pchar: %c\n", string[i], *pchar);
+			pchar++;	
+		}
+		string[i] = '\0';
+		return string;
 	}
 }
 
@@ -118,7 +135,7 @@ char *copy_str(char *inStr, short len, char delim)
 */
 char** tokenize(char* str, char delim)
 {
-
+	int length = count_tokens(str, delim);
 }
 
 void print_all_tokens(char** tokens)
@@ -138,5 +155,6 @@ int main(void)
 	printf("The delimiter is: %c\n", *x);
 	int totToks = count_tokens(pinput, deli);
 	printf("Number of tokens: %d\n", totToks);
+	printf("%d letters from string: %s\n", 5, copy_str(pinput, 7, deli));
 	return 0;
 }
