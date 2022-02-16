@@ -52,6 +52,7 @@ char *word_start(char *str, char delim)
 			// printf("Address: %d\n", pchar);
 			// printf("After increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
 		}
+		//printf("%s\n", pchar);
 		return pchar;
 	}
 }
@@ -137,19 +138,27 @@ char** tokenize(char* str, char delim)
 {
 	int length = count_tokens(str, delim);
 	int i;
-	char start;
-	char end;
 	char** tokens = (char**) malloc((strlen(str) * sizeof(char)));
 	char *start = word_start(str, delim);
 	char *end = end_word(str, delim);
 	for (i = 0; i < length; i++) {
 		int wordLength = end-start;
-		tokens[i] = copy_str(str, wordLength, delim);
+		//printf("Start: %s\n", start);
+		//printf("End: %s\n", end);
+		tokens[i] = copy_str(start, wordLength, delim);
+		//printf("Trying to find new word start\n");
+		start = word_start(end++, delim);
+		if(i == (length-1)){
+			end = str + ((strlen(str) * sizeof(char)));
+		} else { 
+			end = end_word(start, delim);
+		}
+		//printf("New Start: %s\n", start);
+		//printf("New End: %s\n", end);
 		printf("Token %d: %s\n", i, tokens[i]);
-		*start = word_start(*end, delim);
-		*end = end_word(*start, delim);
 	}
-	tokens[i] = '\0';
+	tokens[length] = '\0';
+	printf("Token %d: %s\n", i, tokens[i]);
 	return tokens;
 }
 
