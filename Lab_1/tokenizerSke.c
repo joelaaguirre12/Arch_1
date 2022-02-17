@@ -138,7 +138,7 @@ char** tokenize(char* str, char delim)
 {
 	int length = count_tokens(str, delim);
 	int i;
-	char** tokens = (char**) malloc((strlen(str) * sizeof(char)));
+	char** tokens = (char**) malloc((strlen(str) + (length * 4)) * sizeof(char));
 	char *start = word_start(str, delim);
 	char *end = end_word(str, delim);
 	for (i = 0; i < length; i++) {
