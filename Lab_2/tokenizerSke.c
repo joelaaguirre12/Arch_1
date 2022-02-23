@@ -155,10 +155,8 @@ char** tokenize(char* str, char delim)
 		}
 		//printf("New Start: %s\n", start);
 		//printf("New End: %s\n", end);
-		printf("Token %d: %s\n", i, tokens[i]);
 	}
 	tokens[length] = '\0';
-	printf("Token %d: %s\n", i, tokens[i]);
 	return tokens;
 }
 

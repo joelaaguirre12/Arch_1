@@ -4,6 +4,7 @@
 #include <stdint.h> // use guaranteed 64-bit integers
 #include "tokenizer.h" // Create header file and reference that
 #include "memory.h" // built-in functions to read and write to a specific file
+#include <string.h>
 
 int32_t* reg; // Array of 32 32-bit registers
 
@@ -23,6 +24,17 @@ void init_regs(){
 		reg[i] = i;
 }
 
+/* Personal stringCompare function */
+bool stringCompare(char* str1, char* str2) {
+	while (*str1 != '\0' && *str2 != '\0') {
+		if (*str1 != *str2) {
+			return false;
+		}
+		*str1++;
+		*str2++;
+	}
+	return true;
+}
 
 
 /**
@@ -31,9 +43,39 @@ void init_regs(){
  * as a parameter to this function.
  */
 bool interpret(char* instr){
+	// Load, Store, Add, Addi
+	// AND, OR, XOR (Extra Credit)
+	char** tokens = tokenize(instr, ' ');
+	char* op = tokens[0];
+	char* rd = tokens[1];
+	char* rs1 = tokens[2];
+	//char* imm = tokens[3]; // AKA rs2
+	if (stringCompare(op, "ADD")) {
+		printf("%s\n", op);
+		printf("%s\n", rd);
+		printf("%s\n", rs1);
+		//printf("%s\n", imm);
+	}
+	else if (stringCompare(op, "ADDI")) {
+		printf("%s\n", op);
+		printf("%s\n", rd);
+		printf("%s\n", rs1);
+		//printf("%s\n", imm);
+	}
+	else if (stringCompare(op, "SW")) {
+		printf("%s\n", op);
+		printf("%s\n", rd);
+		printf("%s\n", rs1);
+		//printf("%s\n", imm);
+	}
+	else if (stringCompare(op, "LW")) {
+		printf("%s\n", op);
+		printf("%s\n", rd);
+		printf("%s\n", rs1);
+		//printf("%s\n", imm);
+	}
 	return true;
 }
-
 
 /**
  * Simple demo program to show the usage of read_address() and write_address() found in memory.c
@@ -65,6 +107,10 @@ int main(){
 
 	// Below is a sample program to a write-read. Overwrite this with your own code.
 	write_read_demo();
+	interpret("ADD X6 X0 X29");
+	interpret("ADDI X6 X6 329");
+	interpret("LW X7 1000(X5)");
+	interpret("SW X5 1000(X0)");
 
 	return 0;
 }
