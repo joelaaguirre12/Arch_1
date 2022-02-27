@@ -36,6 +36,11 @@ bool stringCompare(char* str1, char* str2) {
 	return true;
 }
 
+/* Function to specifically take a register in the format 'X0000000' and remove the X and return the register number */
+int32_t regTokenize(char* reg) {
+	char** r = tokenize(reg, 'X');
+	return atoi(r[0]);
+}
 
 /**
  * Fill out this function and use it to read interpret user input to execute RV64 instructions.
@@ -45,6 +50,7 @@ bool stringCompare(char* str1, char* str2) {
 bool interpret(char* instr){
 	// Load, Store, Add, Addi
 	// AND, OR, XOR (Extra Credit)
+	char* mem_file = "mem.txt";
 	char** tokens = tokenize(instr, ' ');
 	char* op = tokens[0]; // operation
 	int rd = regTokenize(tokens[1]); // first argument is always a register
@@ -53,32 +59,34 @@ bool interpret(char* instr){
 		int rs2 = regTokenize(tokens[3]);
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, rs2);
 		reg[rd] = reg[rs1] + reg[rs2];
+		return true;
 	}
 	else if (stringCompare(op, "ADDI")) {
 		int rs1 = regTokenize(tokens[2]);
 		int imm = atoi(tokens[3]);
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
 		reg[rd] = reg[rs1] + imm;
+		return true;
 	}
 	else if (stringCompare(op, "SW")) {
 		// M[R[rs1] + imm]] = rd
 		char** immAndReg1 = tokenize(tokens[2], '(');
-		print_all_tokens(immAndReg1, count_tokens(tokens[2], '('));
 		int32_t imm = atoi(immAndReg1[0]);
-		char** reg1 = tokenize(immAndReg1[1], ')');
-		//printf("%s, %d, %s\n", op, rd, rs1, imm);
-		//printf("%s\n", imm);
+		char* reg1 = immAndReg1[1];
+		char** tokReg1 = tokenize(reg1, ')');
+		int32_t rs1 = regTokenize(tokReg1[0]);
+		int32_t address = reg[rs1] + imm;
+		printf("Address: %d\n", address);
+		printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
+		write_address(reg[rd], address, mem_file);
+		return true;
 	}
 	else if (stringCompare(op, "LW")) {
 		//printf("%s, %d, %s\n", op, rd, reg1);
 		//printf("%s\n", imm);
+		return true;
 	}
-	return true;
-}
-
-int32_t regTokenize(char* reg) {
-	char** r = tokenize(reg, 'X');
-	return atoi(r[0]);
+	return false;
 }
 
 /**
@@ -119,6 +127,7 @@ void print_regs(){
  *
  */
 int main(){
+	char* mem_file = "mem.txt";
 	// Do not write any code between init_regs
 	init_regs(); // DO NOT REMOVE THIS LINE
 
@@ -129,16 +138,21 @@ int main(){
 	write_read_demo();
 	printf("Interpret add...\n");
 	interpret("ADD X6 X4 X29");
-	//print_regs();
-	printf("Interpret addi...\n");
-	interpret("ADDI X6 X6 329");
 	print_regs();
+
+	printf("Interpret addi...\n");
+	interpret("ADDI X6 X8 329");
+	print_regs();
+
+	printf("Interpret sw...\n");
+	interpret("SW X5 80(X8)");
+	int32_t read = read_address(88, mem_file);
+	printf("Read address %lu (0x%lX): %lu (0x%lX)\n", 88, 88, read, read);
+	print_regs();
+
 	printf("Interpret lw...\n");
 	interpret("LW X7 1000(X5)");
 	print_regs();
-	printf("Interpret sw...\n");
-	interpret("SW X5 1000(X0)");
-	//print_regs();
 
 	return 0;
 }

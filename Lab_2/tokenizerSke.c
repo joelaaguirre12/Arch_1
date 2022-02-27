@@ -42,12 +42,12 @@ char *word_start(char *str, char delim)
 	pchar = str;
 	// if string is empty, return 0
 	if(strlen(str) == 0) {
-		return 0;
+		return pchar;
 	}
 	else {
 		// printf("Before increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
 		while (delim_character(*pchar, delim)) {
-			// printf("'%c' is not a delim, continuing loop...\n", *pchar);
+			//printf("'%c' is a delim, continuing loop...\n", *pchar);
 			pchar++;
 			// printf("Address: %d\n", pchar);
 			// printf("After increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
@@ -60,20 +60,24 @@ char *word_start(char *str, char delim)
 /* Returns a pointer to the first delimiter character of the zero
    terminated string*/
 char *end_word(char *str,char delim)
-{
+{		
 	char *pchar;
 	pchar = str;
 	if(strlen(str) == 0) {
-		return 0;
+		return pchar;
 	}
 	else {
-		// printf("Before increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
+		//printf("Before increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
+		if ((*pchar == '\0') && delim_character(*(pchar-1), delim)) {
+			return pchar-1;
+		}
 		while (non_delim_character(*pchar, delim)) {
-			// printf("'%c' is not a delim, continuing loop...\n", *pchar);
+			//printf("'%c' is not a delim, continuing loop...\n", *pchar);
 			pchar++;
 			// printf("Address: %d\n", pchar);
-			// printf("After increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
+			//printf("After increment: *pchar = '%c' pchar = %d\n", *pchar, pchar);
 		}
+		//printf("Broke out of loop with character: '%c'\n", *pchar);
 		return pchar;
 	}
 }
@@ -95,6 +99,7 @@ int count_tokens(char* str,char delim)
 			pchar++;
 		}
 		num_tok++;
+		//printf("%d\n", num_tok);
 		return num_tok;
 	}
 }
