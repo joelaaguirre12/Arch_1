@@ -26,8 +26,8 @@ void init_regs(){
 
 /* Personal stringCompare function */
 bool stringCompare(char* str1, char* str2) {
-	while (*str1 != '\0' && *str2 != '\0') {
-		if (*str1 != *str2) {
+	while (*str1 != '\0' || *str2 != '\0') {
+		if ((*str1 != *str2) || (*str1 == '\0' && *str2 != '\0') || (*str1 != '\0' && *str2 == '\0')) {
 			return false;
 		}
 		*str1++;
@@ -46,35 +46,39 @@ bool interpret(char* instr){
 	// Load, Store, Add, Addi
 	// AND, OR, XOR (Extra Credit)
 	char** tokens = tokenize(instr, ' ');
-	char* op = tokens[0];
-	char* rd = tokens[1];
-	char* rs1 = tokens[2];
-	//char* imm = tokens[3]; // AKA rs2
+	char* op = tokens[0]; // operation
+	int rd = regTokenize(tokens[1]); // first argument is always a register
 	if (stringCompare(op, "ADD")) {
-		printf("%s\n", op);
-		printf("%s\n", rd);
-		printf("%s\n", rs1);
-		//printf("%s\n", imm);
+		int rs1 = regTokenize(tokens[2]);
+		int rs2 = regTokenize(tokens[3]);
+		//printf("%s, %d, %d, %d\n", op, rd, rs1, rs2);
+		reg[rd] = reg[rs1] + reg[rs2];
 	}
 	else if (stringCompare(op, "ADDI")) {
-		printf("%s\n", op);
-		printf("%s\n", rd);
-		printf("%s\n", rs1);
-		//printf("%s\n", imm);
+		int rs1 = regTokenize(tokens[2]);
+		int imm = atoi(tokens[3]);
+		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
+		reg[rd] = reg[rs1] + imm;
 	}
 	else if (stringCompare(op, "SW")) {
-		printf("%s\n", op);
-		printf("%s\n", rd);
-		printf("%s\n", rs1);
+		// M[R[rs1] + imm]] = rd
+		char** immAndReg1 = tokenize(tokens[2], '(');
+		print_all_tokens(immAndReg1, count_tokens(tokens[2], '('));
+		int32_t imm = atoi(immAndReg1[0]);
+		char** reg1 = tokenize(immAndReg1[1], ')');
+		//printf("%s, %d, %s\n", op, rd, rs1, imm);
 		//printf("%s\n", imm);
 	}
 	else if (stringCompare(op, "LW")) {
-		printf("%s\n", op);
-		printf("%s\n", rd);
-		printf("%s\n", rs1);
+		//printf("%s, %d, %s\n", op, rd, reg1);
 		//printf("%s\n", imm);
 	}
 	return true;
+}
+
+int32_t regTokenize(char* reg) {
+	char** r = tokenize(reg, 'X');
+	return atoi(r[0]);
 }
 
 /**
@@ -98,6 +102,19 @@ void write_read_demo(){
 }
 
 /**
+ * Prints all 32 registers in column-format
+ */
+void print_regs(){
+	int col_size = 10;
+	for(int i = 0; i < 8; i++){
+		printf("X%02i:%.*lld", i, col_size, (long long int) reg[i]);
+		printf(" X%02i:%.*lld", i+8, col_size, (long long int) reg[i+8]);
+		printf(" X%02i:%.*lld", i+16, col_size, (long long int) reg[i+16]);
+		printf(" X%02i:%.*lld\n", i+24, col_size, (long long int) reg[i+24]);
+	}
+}
+
+/**
  * Your code goes in the main
  *
  */
@@ -105,12 +122,23 @@ int main(){
 	// Do not write any code between init_regs
 	init_regs(); // DO NOT REMOVE THIS LINE
 
+	printf("Intitial registers:\n");
+	print_regs();
+
 	// Below is a sample program to a write-read. Overwrite this with your own code.
 	write_read_demo();
-	interpret("ADD X6 X0 X29");
+	printf("Interpret add...\n");
+	interpret("ADD X6 X4 X29");
+	//print_regs();
+	printf("Interpret addi...\n");
 	interpret("ADDI X6 X6 329");
+	print_regs();
+	printf("Interpret lw...\n");
 	interpret("LW X7 1000(X5)");
+	print_regs();
+	printf("Interpret sw...\n");
 	interpret("SW X5 1000(X0)");
+	//print_regs();
 
 	return 0;
 }
