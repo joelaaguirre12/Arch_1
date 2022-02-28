@@ -24,6 +24,19 @@ void init_regs(){
 		reg[i] = i;
 }
 
+/**
+ * Prints all 32 registers in column-format
+ */
+void print_regs(){
+	int col_size = 10;
+	for(int i = 0; i < 8; i++){
+		printf("X%02i:%.*lld", i, col_size, (long long int) reg[i]);
+		printf(" X%02i:%.*lld", i+8, col_size, (long long int) reg[i+8]);
+		printf(" X%02i:%.*lld", i+16, col_size, (long long int) reg[i+16]);
+		printf(" X%02i:%.*lld\n", i+24, col_size, (long long int) reg[i+24]);
+	}
+}
+
 /* Personal stringCompare function */
 bool stringCompare(char* str1, char* str2) {
 	while (*str1 != '\0' || *str2 != '\0') {
@@ -59,6 +72,7 @@ bool interpret(char* instr){
 		int rs2 = regTokenize(tokens[3]);
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, rs2);
 		reg[rd] = reg[rs1] + reg[rs2];
+		print_regs();
 		return true;
 	}
 	else if (stringCompare(op, "ADDI")) {
@@ -66,24 +80,35 @@ bool interpret(char* instr){
 		int imm = atoi(tokens[3]);
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
 		reg[rd] = reg[rs1] + imm;
+		print_regs();
 		return true;
 	}
 	else if (stringCompare(op, "SW")) {
-		// M[R[rs1] + imm]] = rd
+		// M[R[rs1] + imm]] = R[rd]
 		char** immAndReg1 = tokenize(tokens[2], '(');
 		int32_t imm = atoi(immAndReg1[0]);
 		char* reg1 = immAndReg1[1];
 		char** tokReg1 = tokenize(reg1, ')');
 		int32_t rs1 = regTokenize(tokReg1[0]);
 		int32_t address = reg[rs1] + imm;
-		printf("Address: %d\n", address);
-		printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
+		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
 		write_address(reg[rd], address, mem_file);
+		int32_t read = read_address(address, mem_file);
+		printf("Read address %lu (0x%lX): %lu (0x%lX)\n", address, address, read, read);
 		return true;
 	}
 	else if (stringCompare(op, "LW")) {
-		//printf("%s, %d, %s\n", op, rd, reg1);
-		//printf("%s\n", imm);
+		// R[rd] = M[R[rs1] + imm]]
+		char** immAndReg1 = tokenize(tokens[2], '(');
+		int32_t imm = atoi(immAndReg1[0]);
+		char* reg1 = immAndReg1[1];
+		char** tokReg1 = tokenize(reg1, ')');
+		int32_t rs1 = regTokenize(tokReg1[0]);
+		int32_t address = reg[rs1] + imm;
+		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
+		int32_t read = read_address(address, mem_file);
+		printf("Read address %lu (0x%lX): %lu (0x%lX)\n", address, address, read, read);
+		reg[rd] = read_address(address, mem_file);
 		return true;
 	}
 	return false;
@@ -109,18 +134,6 @@ void write_read_demo(){
 	printf("Read address %lu (0x%lX): %lu (0x%lX)\n", address, address, read, read); // %lu -> format as an long-unsigned
 }
 
-/**
- * Prints all 32 registers in column-format
- */
-void print_regs(){
-	int col_size = 10;
-	for(int i = 0; i < 8; i++){
-		printf("X%02i:%.*lld", i, col_size, (long long int) reg[i]);
-		printf(" X%02i:%.*lld", i+8, col_size, (long long int) reg[i+8]);
-		printf(" X%02i:%.*lld", i+16, col_size, (long long int) reg[i+16]);
-		printf(" X%02i:%.*lld\n", i+24, col_size, (long long int) reg[i+24]);
-	}
-}
 
 /**
  * Your code goes in the main
@@ -135,23 +148,18 @@ int main(){
 	print_regs();
 
 	// Below is a sample program to a write-read. Overwrite this with your own code.
-	write_read_demo();
-	printf("Interpret add...\n");
+	//write_read_demo();
+	printf("Interpret ADD X6 X4 X29...\n");
 	interpret("ADD X6 X4 X29");
-	print_regs();
 
-	printf("Interpret addi...\n");
+	printf("Interpret ADDI X6 X8 329...\n");
 	interpret("ADDI X6 X8 329");
-	print_regs();
 
-	printf("Interpret sw...\n");
+	printf("Interpret SW X5 80(X8)...\n");
 	interpret("SW X5 80(X8)");
-	int32_t read = read_address(88, mem_file);
-	printf("Read address %lu (0x%lX): %lu (0x%lX)\n", 88, 88, read, read);
-	print_regs();
 
-	printf("Interpret lw...\n");
-	interpret("LW X7 1000(X5)");
+	printf("Interpret LW X7 52(X5)...\n");
+	interpret("LW X7 52(X5)");
 	print_regs();
 
 	return 0;
