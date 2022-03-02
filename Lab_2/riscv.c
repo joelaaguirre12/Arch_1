@@ -40,7 +40,7 @@ void print_regs(){
 /* Personal stringCompare function */
 bool stringCompare(char* str1, char* str2) {
 	while (*str1 != '\0' || *str2 != '\0') {
-		if ((*str1 != *str2) || (*str1 == '\0' && *str2 != '\0') || (*str1 != '\0' && *str2 == '\0')) {
+		if ((*str1 != *str2) || (*str1 == '\0' && *str2 != '\0') || (*str1 != '\0' && *str2 == '\0')) { // if strings are not equal, or not equal in length
 			return false;
 		}
 		*str1++;
@@ -62,15 +62,15 @@ int32_t regTokenize(char* reg) {
  */
 bool interpret(char* instr){
 	// Load, Store, Add, Addi
-	// AND, OR, XOR (Extra Credit)
 	char* mem_file = "mem.txt";
-	char** tokens = tokenize(instr, ' ');
+	char** tokens = tokenize(instr, ',');
 	char* op = tokens[0]; // operation
 	int rd = regTokenize(tokens[1]); // first argument is always a register
 	if (stringCompare(op, "ADD")) {
 		int rs1 = regTokenize(tokens[2]);
 		int rs2 = regTokenize(tokens[3]);
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, rs2);
+		printf("Putting %d in register X%d\n", (reg[rs1] + reg[rs2]), rd);
 		reg[rd] = reg[rs1] + reg[rs2];
 		print_regs();
 		return true;
@@ -79,6 +79,7 @@ bool interpret(char* instr){
 		int rs1 = regTokenize(tokens[2]);
 		int imm = atoi(tokens[3]);
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
+		printf("Putting %d in register X%d\n", (reg[rs1] + imm), rd);
 		reg[rd] = reg[rs1] + imm;
 		print_regs();
 		return true;
@@ -91,6 +92,9 @@ bool interpret(char* instr){
 		char** tokReg1 = tokenize(reg1, ')');
 		int32_t rs1 = regTokenize(tokReg1[0]);
 		int32_t address = reg[rs1] + imm;
+		if ((address % 2) != 0) {
+			address++;
+		}
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
 		write_address(reg[rd], address, mem_file);
 		int32_t read = read_address(address, mem_file);
@@ -105,10 +109,14 @@ bool interpret(char* instr){
 		char** tokReg1 = tokenize(reg1, ')');
 		int32_t rs1 = regTokenize(tokReg1[0]);
 		int32_t address = reg[rs1] + imm;
+		if ((address % 2) != 0) {
+			address++;
+		}
 		//printf("%s, %d, %d, %d\n", op, rd, rs1, imm);
 		int32_t read = read_address(address, mem_file);
-		printf("Read address %lu (0x%lX): %lu (0x%lX)\n", address, address, read, read);
+		printf("Putting value %lu (0x%lX) in register X%d\n", read, read, rd);
 		reg[rd] = read_address(address, mem_file);
+		print_regs();
 		return true;
 	}
 	return false;
@@ -141,6 +149,7 @@ void write_read_demo(){
  */
 int main(){
 	char* mem_file = "mem.txt";
+	char command[50];
 	// Do not write any code between init_regs
 	init_regs(); // DO NOT REMOVE THIS LINE
 
@@ -149,18 +158,26 @@ int main(){
 
 	// Below is a sample program to a write-read. Overwrite this with your own code.
 	//write_read_demo();
-	printf("Interpret ADD X6 X4 X29...\n");
-	interpret("ADD X6 X4 X29");
+	
+	printf("Interpret ADD,X6,X4,X29...\n");
+	interpret("ADD,X6,X4,X29");
 
-	printf("Interpret ADDI X6 X8 329...\n");
-	interpret("ADDI X6 X8 329");
+	printf("Interpret ADDI,X15,X3,329...\n");
+	interpret("ADDI,X15,X3,329");
+	
+	printf("Interpret SW,X5,0(X8)...\n");
+	interpret("SW,X5,0(X8)");
 
-	printf("Interpret SW X5 80(X8)...\n");
-	interpret("SW X5 80(X8)");
+	printf("Interpret LW,X7,4(X5)...\n");
+	interpret("LW,X7,4(X5)");
 
-	printf("Interpret LW X7 52(X5)...\n");
-	interpret("LW X7 52(X5)");
-	print_regs();
-
-	return 0;
+	printf("Enter your command, which should be IN ALL CAPS and separated by commas (Example: \"ADD,X10,X14,X8\").\nAlternatively, you can enter 'q' to exit.\n");
+	scanf("%s", command);
+	if (stringCompare(command, "q")) {
+		return 0;
+	}
+	else {
+		interpret(command);
+		return 0;
+	}
 }
