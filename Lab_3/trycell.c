@@ -1,5 +1,10 @@
+extern long returnsp();
 int trycell(int *x, int pos)
 {
+    unsigned long sp;
+    sp = returnsp();
+    printf("Entering TryCell, Stack Pointer:%x\n", sp);
+
     int row = pos / 9;
     int col = pos % 9;
     int i, j, used = 0;
@@ -23,5 +28,6 @@ int trycell(int *x, int pos)
         if (!(used & 1) && trycell(x, pos + 1)) return 1;
 
     x[pos] = 0;
+    printf("Returning TryCell, Stack Pointer:%x\n", sp);
     return 0;
 }
